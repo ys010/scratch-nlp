@@ -1,0 +1,13 @@
+# Large raw/derived corpus artifacts from other experiments -- not needed to
+# serve the Mission 1 page (its data is baked into index.html) and too large/
+# sensitive (song lyrics) for a public repo.
+*.zip
+hebrew_songs_lyrics.txt
+hebrew_wiki_tomron.txt
+hebrew_bigram_eval.html
+hebrew_songs_bigram_eval.html
+kaggle_songs_raw/
+scratch_lists_songs/
+scratch_lists_tomron/
+fetch.log
+.venv/
