@@ -11,3 +11,10 @@ scratch_lists_songs/
 scratch_lists_tomron/
 fetch.log
 .venv/
+
+# Tutor: per-student run data (snapshots, parsed output, logs) -- never
+# committed, and each run's own settings override (worktree fallback only).
+runs/
+.claude/settings.local.json
+__pycache__/
+*.pyc
