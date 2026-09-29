@@ -16,7 +16,7 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 REPO_NAME="$(basename "$REPO_ROOT")"
 WORKTREE_DIR="${1:-$REPO_ROOT/../${REPO_NAME}-tutor}"
 
-if [ ! -d "$WORKTREE_DIR/.git" ]; then
+if [ ! -e "$WORKTREE_DIR/.git" ]; then
   echo "error: no worktree found at $WORKTREE_DIR" >&2
   echo "create it first: git worktree add $WORKTREE_DIR -b tutor" >&2
   exit 1
