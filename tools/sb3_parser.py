@@ -59,6 +59,7 @@ OPCODE_LABELS = {
     "sensing_touchingobject": "touching [{TOUCHINGOBJECTMENU}] ?",
     "sensing_keypressed": "key [{KEY_OPTION}] pressed?",
     "sensing_askandwait": "ask [{QUESTION}] and wait",
+    "sensing_answer": "answer",
     "operator_add": "({NUM1} + {NUM2})",
     "operator_subtract": "({NUM1} - {NUM2})",
     "operator_multiply": "({NUM1} * {NUM2})",
@@ -69,6 +70,12 @@ OPCODE_LABELS = {
     "operator_and": "<{OPERAND1}> and <{OPERAND2}>",
     "operator_or": "<{OPERAND1}> or <{OPERAND2}>",
     "operator_not": "not <{OPERAND}>",
+    "operator_length": "length of [{STRING}]",
+    "operator_letter_of": "letter ({LETTER}) of [{STRING}]",
+    "operator_contains": "[{STRING1}] contains [{STRING2}]?",
+    "operator_join": "join [{STRING1}] [{STRING2}]",
+    "operator_mod": "({NUM1} mod {NUM2})",
+    "operator_random": "pick random ({FROM}) to ({TO})",
     "data_setvariableto": "set [{VARIABLE}] to ({VALUE})",
     "data_changevariableby": "change [{VARIABLE}] by ({VALUE})",
 }
@@ -83,7 +90,7 @@ def load_project_json(sb3_path):
             return json.load(f)
 
 
-def resolve_input_value(blocks, input_value):
+def resolve_input_value(blocks, input_value, acc=None):
     """
     A block's `inputs[NAME]` entry looks like [shadow_status, value_or_id, ...].
     `value_or_id` is either:
@@ -92,6 +99,14 @@ def resolve_input_value(blocks, input_value):
       - None, meaning the slot is empty
     Returns a short display string; reporter blocks are rendered as their
     own pseudocode fragment (recursively), not just an opaque ID.
+
+    `acc`, if given, is `{"opcodes": set(), "block_ids": set()}`: every
+    reporter block visited while resolving (e.g. `operator_length` plugged
+    into a `control_repeat_until` condition) is recorded into it. Without
+    this, a reporter plugged into a value slot -- as opposed to snapped into
+    a stack -- would be invisible to opcodes_present / the diff, even though
+    it's exactly the kind of block a lesson like "length of / letter of"
+    needs the tutor to be able to detect.
     """
     if not input_value:
         return ""
@@ -107,12 +122,16 @@ def resolve_input_value(blocks, input_value):
         block = blocks.get(target)
         if block is None:
             return "?"
-        return render_reporter(blocks, block)
+        return render_reporter(blocks, block, acc, block_id=target)
     return "?"
 
 
-def render_reporter(blocks, block):
+def render_reporter(blocks, block, acc=None, block_id=None):
     opcode = block.get("opcode", "")
+    if acc is not None:
+        acc["opcodes"].add(opcode)
+        if block_id is not None:
+            acc["block_ids"].add(block_id)
     fields = block.get("fields", {}) or {}
     inputs = block.get("inputs", {}) or {}
     if opcode == "math_number" or opcode == "math_integer" or opcode == "math_positive_number":
@@ -128,14 +147,14 @@ def render_reporter(blocks, block):
     for name, val in inputs.items():
         if name in SUBSTACK_INPUTS:
             continue
-        params[name] = resolve_input_value(blocks, val)
+        params[name] = resolve_input_value(blocks, val, acc)
     try:
         return label.format(**params)
     except (KeyError, IndexError):
         return label
 
 
-def build_node(blocks, block_id, seen):
+def build_node(blocks, block_id, seen, acc=None):
     if block_id is None or block_id in seen:
         return None
     seen.add(block_id)
@@ -144,6 +163,9 @@ def build_node(blocks, block_id, seen):
         return None
 
     opcode = block.get("opcode", "unknown")
+    if acc is not None:
+        acc["opcodes"].add(opcode)
+        acc["block_ids"].add(block_id)
     fields = {name: val[0] if val else "" for name, val in (block.get("fields") or {}).items()}
     inputs_raw = block.get("inputs", {}) or {}
 
@@ -151,7 +173,7 @@ def build_node(blocks, block_id, seen):
     for name, val in inputs_raw.items():
         if name in SUBSTACK_INPUTS:
             continue
-        params[name] = resolve_input_value(blocks, val)
+        params[name] = resolve_input_value(blocks, val, acc)
 
     label_template = OPCODE_LABELS.get(opcode, opcode)
     try:
@@ -173,19 +195,19 @@ def build_node(blocks, block_id, seen):
     # from "this block doesn't wrap anything at all".
     if "SUBSTACK" in inputs_raw:
         sub = inputs_raw.get("SUBSTACK")
-        node["substack"] = build_stack(blocks, sub[1], seen) if sub and isinstance(sub[1], str) else []
+        node["substack"] = build_stack(blocks, sub[1], seen, acc) if sub and isinstance(sub[1], str) else []
     if "SUBSTACK2" in inputs_raw:
         sub2 = inputs_raw.get("SUBSTACK2")
-        node["substack2"] = build_stack(blocks, sub2[1], seen) if sub2 and isinstance(sub2[1], str) else []
+        node["substack2"] = build_stack(blocks, sub2[1], seen, acc) if sub2 and isinstance(sub2[1], str) else []
 
     next_id = block.get("next")
-    node["next"] = build_node(blocks, next_id, seen) if next_id else None
+    node["next"] = build_node(blocks, next_id, seen, acc) if next_id else None
     return node
 
 
-def build_stack(blocks, first_id, seen):
+def build_stack(blocks, first_id, seen, acc=None):
     result = []
-    node = build_node(blocks, first_id, seen)
+    node = build_node(blocks, first_id, seen, acc)
     while node is not None:
         nxt = node.pop("next", None)
         result.append(node)
@@ -205,40 +227,20 @@ def node_to_pseudocode(node, indent=0):
     return "\n".join(lines)
 
 
-def collect_opcodes(node, acc):
-    acc.add(node["opcode"])
-    for sub_node in node.get("substack", []) or []:
-        collect_opcodes(sub_node, acc)
-    for sub_node in node.get("substack2", []) or []:
-        collect_opcodes(sub_node, acc)
-
-
-def collect_block_ids(node, acc):
-    acc.add(node["id"])
-    for sub_node in node.get("substack", []) or []:
-        collect_block_ids(sub_node, acc)
-    for sub_node in node.get("substack2", []) or []:
-        collect_block_ids(sub_node, acc)
-
-
 def parse_target(target):
     blocks = target.get("blocks", {}) or {}
     scripts = []
-    all_opcodes = set()
-    all_block_ids = set()
+    acc = {"opcodes": set(), "block_ids": set()}
     for block_id, block in blocks.items():
         if not isinstance(block, dict):
             continue  # variable/list reporter values are stored inline too
         if not block.get("topLevel") or block.get("shadow"):
             continue
         seen = set()
-        stack = build_stack(blocks, block_id, seen)
-        for node in stack:
-            collect_opcodes(node, all_opcodes)
-            collect_block_ids(node, all_block_ids)
+        stack = build_stack(blocks, block_id, seen, acc)
         pseudocode = "\n".join(node_to_pseudocode(node) for node in stack)
         scripts.append({"pseudocode": pseudocode, "tree": stack})
-    return scripts, all_opcodes, all_block_ids
+    return scripts, acc["opcodes"], acc["block_ids"]
 
 
 def parse_project(project_json):
