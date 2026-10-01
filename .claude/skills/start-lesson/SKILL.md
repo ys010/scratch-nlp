@@ -28,6 +28,7 @@ Arguments: $ARGUMENTS  (first = lesson-id, second = student id)
               "hints_given": 0, "attempts": 0, "last_snapshot": null }
      },
      "last_snapshot": null,
+     "exchanges_since_progress_bar": 0,
      "notes": ""
    }
    ```

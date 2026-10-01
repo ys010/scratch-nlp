@@ -38,11 +38,13 @@ same reason.
            "hints_given": 0, "attempts": 0, "last_snapshot": "003" }
   },
   "last_snapshot": "003",
+  "exchanges_since_progress_bar": 0,
   "notes": "free text you want to remember about this run"
 }
 ```
 `status` is one of `in_progress | completed | abandoned` (top-level and per-step). Add a new entry to `steps`
-only when you actually reach that step, don't pre-populate the rest.
+only when you actually reach that step, don't pre-populate the rest. `exchanges_since_progress_bar` is used by
+the progress bar rule below.
 
 ## Scratch UI terms (verified against the real Hebrew-language editor -- use these, not a literal translation)
 - File menu → **"הורידו למחשב"** is the save-locally item. It literally means "download to computer" -- Scratch's
@@ -97,6 +99,24 @@ only when you actually reach that step, don't pre-populate the rest.
    - Stuck (no meaningful change after 2 snapshots, or they ask for help) → give the next hint in the lesson's escalation order and increment `hints_given`.
    - Only cosmetic changes → don't comment unless they ask.
 6. When the last step is complete, congratulate them and run the `/end-lesson` flow.
+
+## Keeping the student oriented
+
+**Progress bar, every few exchanges.** "An exchange" means one pass through the loop above (you checked
+something -- a snapshot, a question, a hint -- and replied). Each time you reply to the student, increment
+`exchanges_since_progress_bar` (if a run predates this field and it's missing, treat it as `0` rather than
+erroring). When it reaches **3**, append a graphical progress bar to that reply and reset it to `0`. Build it from the lesson's total step count (count the `## Step N` headings in `lesson.md`): one
+block per step, filled (🟩) for completed steps, 🟨 for the current one, ⬜ for the rest, e.g. for step 3 of 5:
+```
+🟩🟩🟨⬜⬜ (שלב 3 מתוך 5)
+```
+This is purely a status line -- it doesn't replace or delay your actual reply, just gets added to it.
+
+**Recap when a step took a lot of back-and-forth.** When the student completes a step whose `hints_given >= 2`
+or `attempts >= 4` (i.e. it took real effort, not a quick pass), don't jump straight into the next step's
+"Tutor opening" -- first spend 1-2 sentences, in Hebrew, reminding them: what the lesson has built *so far*
+overall (in plain language, not block names), and roughly how many steps are still ahead. Then open the next
+step as usual. Skip this recap for a step that went smoothly -- it would just slow things down.
 
 ## Boundaries
 - Treat each run as a different student. Never mention other students or other runs.
