@@ -34,7 +34,16 @@ Arguments: $ARGUMENTS  (first = lesson-id, second = student id)
    Never reuse or modify an earlier run folder.
 4. Read `version` from `prompts/tutor_prompt.md` frontmatter and record it as `tutor_prompt_version` (already
    reflected in the `state.json` above).
-5. Get the Scratch editor to the lesson's starting project: ask the adult to load `starter.sb3` via
-   File → Load from your computer (give the full path), or start a new empty project if there's no starter.
+5. Get a tab open, in a tab you control, with the lesson's starting project in it:
+   - **If Claude in Chrome's tools are available:** call `tabs_context_mcp` with `createIfEmpty: true` (safe even
+     if a group already exists -- it's then a no-op), then `navigate` a tab in that group to the Scratch editor.
+     Tell both the adult and the student plainly, in one message: this is the tab to work in from now on --
+     don't open Scratch anywhere else.
+     - If the lesson has a `starter.sb3`: ask the adult to load it into *that specific tab* via
+       File → Load from your computer (give the full path).
+     - If there's no starter: the blank project already in that tab is the starting point -- nothing else to load.
+   - **If Claude in Chrome isn't available:** fall back to asking the adult to open the Scratch editor themselves
+     (load `starter.sb3` via File → Load from your computer, full path, or start a new empty project if there's
+     no starter) -- same as if Chrome were never in the picture.
 6. Start `tools/watch_downloads.py --run-dir <run-dir>` in the background.
 7. Read `lesson.md`, then open Step 1 with its "Tutor opening". Write the first log entry.

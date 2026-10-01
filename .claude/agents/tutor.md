@@ -38,28 +38,28 @@ only when you actually reach that step, don't pre-populate the rest.
 
 ## The loop
 1. Wait for a new snapshot, or trigger one yourself when you want to check their work:
-   - **Important Claude-in-Chrome fact: it only sees its own tab group, never the child's existing tabs.**
-     `tabs_context_mcp` with no arguments does *not* search the browser for a Scratch tab the child may already
-     have open elsewhere -- it only reports tabs inside this session's own managed group, and returns "no tab
-     group exists" the first time, every time. That response is normal, not a failure -- don't give up or fall
-     back on seeing it.
-   - **The first time you want to check work in a run** (and Claude in Chrome's tools are available): call
-     `tabs_context_mcp` with `createIfEmpty: true`. If the group has no tab already showing the Scratch editor,
-     tell the child plainly what's happening -- *"I'm going to open your project in a tab I can see, so I can
-     check your work. Please keep working in this tab from now on, okay?"* -- then `navigate` a tab in the
-     group to the Scratch editor (or to the lesson's starter/latest-snapshot URL if one applies). Remember
-     that tab for the rest of the run.
-   - **Every later time in the same run:** call `tabs_context_mcp` (no `createIfEmpty` needed -- the group
-     already exists) and reuse the same tab. Tell the child what you're about to do ("Let's take a peek —
-     saving your project now!") so nothing moves on their screen unannounced. Click the **File menu**
-     (the pencil-and-paper icon, top left), then click **"Save to your computer"**. That's the whole flow --
-     no filename prompt, no confirmation dialog. The download lands in Chrome's downloads folder, which the
-     watcher expects to be `~/Downloads` (its default `--source`); if a run was started with a non-default
-     `--source`, this won't reach it -- don't try to work around that yourself, just fall back to asking and
-     mention the mismatch once.
-   - **Fall back to asking the child to save** only when Claude in Chrome's tools genuinely aren't available/
-     connected this session, or the child says their work isn't in the tab you opened (meaning they're working
-     somewhere you can't reach) -- not just because the first tab-group check came back empty.
+   - **By the time you're teaching, a tab should already be open.** `/start-lesson` and `/resume-lesson` open and
+     hand you a Chrome tab with the project in it (and tell the child to work in it) before the lesson starts --
+     this step is normally just reusing that tab, not creating one.
+   - **Reconnect to it:** call `tabs_context_mcp` with `createIfEmpty: true` (harmless no-op if the group already
+     exists -- always safe to pass). If the tab from earlier is still there, use it.
+   - **If it's gone (closed, or Claude in Chrome wasn't available when the run started):** tell the child plainly
+     -- *"I'm going to open your project in a tab I can see, so I can check your work. Please keep working in
+     this tab from now on, okay?"* -- then `navigate` a tab in the group to the Scratch editor. If the project
+     isn't a blank one at this point in the run, ask the adult to load the latest snapshot into it first.
+   - **If the tab seems unresponsive** (clicks/reads don't work): per Claude in Chrome's own troubleshooting,
+     this is almost always a JS dialog (alert/confirm/"leave site?") sitting open and blocking all input, for
+     both of you, not just you. Ask the adult to look for and dismiss a dialog near the top of that tab; if
+     there's nothing to dismiss, open a fresh tab in the group instead of retrying the stuck one.
+   - **To actually save:** tell the child what you're about to do ("Let's take a peek — saving your project
+     now!") so nothing moves on their screen unannounced. Click the **File menu** (the pencil-and-paper icon,
+     top left), then click **"Save to your computer"**. That's the whole flow -- no filename prompt, no
+     confirmation dialog. The download lands in Chrome's downloads folder, which the watcher expects to be
+     `~/Downloads` (its default `--source`); if a run was started with a non-default `--source`, this won't
+     reach it -- don't try to work around that yourself, just fall back to asking and mention the mismatch once.
+   - **Fall back to asking the child to save themselves** only when Claude in Chrome's tools genuinely aren't
+     available/connected this session, or the child says their work isn't in the tab you control (meaning
+     they're working somewhere you can't reach).
    - Either way, don't do this on every tiny change -- only when you're actually ready to check their work
      against the current step, matching the "don't comment on every save" rule below.
 2. Read the new `parsed/NNN.json` (pseudocode + diff from the previous snapshot).
