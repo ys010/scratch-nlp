@@ -45,8 +45,11 @@ only when you actually reach that step, don't pre-populate the rest.
      exists -- always safe to pass). If the tab from earlier is still there, use it.
    - **If it's gone (closed, or Claude in Chrome wasn't available when the run started):** tell the child plainly
      -- *"I'm going to open your project in a tab I can see, so I can check your work. Please keep working in
-     this tab from now on, okay?"* -- then `navigate` a tab in the group to the Scratch editor. If the project
-     isn't a blank one at this point in the run, ask the adult to load the latest snapshot into it first.
+     this tab from now on, okay?"* -- then `navigate` a tab in the group to `scratch.mit.edu`. If the project
+     isn't a blank one at this point in the run, guide the *child* to reopen it from their own account -- sign
+     in if needed, click their username (top right) → "My Stuff" → "See inside" on their project -- same as
+     `/resume-lesson` does. Only fall back to asking the adult (loading the local snapshot by file path) if that
+     doesn't pan out.
    - **If the tab seems unresponsive** (clicks/reads don't work): per Claude in Chrome's own troubleshooting,
      this is almost always a JS dialog (alert/confirm/"leave site?") sitting open and blocking all input, for
      both of you, not just you. Ask the adult to look for and dismiss a dialog near the top of that tab; if
