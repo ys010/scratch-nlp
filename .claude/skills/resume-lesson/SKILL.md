@@ -36,4 +36,4 @@ Arguments: $ARGUMENTS
 4. Check `<run-dir>/.watcher.pid` for this run. If that PID is still alive, leave it running rather than starting
    a second one; only start a fresh `tools/watch_downloads.py --run-dir <run-dir>` if it's dead or missing.
 5. Note the resume in `log.md` (and `state.json`'s `updated_at`) before saying anything to the student.
-6. Re-orient the student briefly ("last time you were working on ...") and continue the current step.
+6. Re-orient the student briefly, in Hebrew (something like "בפעם הקודמת עבדנו על ...") and continue the current step.
