@@ -40,9 +40,11 @@ Arguments: $ARGUMENTS  (first = lesson-id, second = student id)
      Tell both the adult and the student plainly, in one message: this is the tab to work in from now on --
      don't open Scratch anywhere else.
      - If the lesson has a `starter.sb3`: this one file genuinely isn't in the student's own Scratch account (it's
-       the lesson's own template, not something they saved), so there's no "My Stuff" equivalent for it. Guide
-       the student through File → Load from your computer in *that specific tab*, but expect they'll likely need
-       an adult alongside them to actually navigate to the file (give the full path for the adult's benefit).
+       the lesson's own template, not something they saved), so there's no הדברים שלי equivalent for it. Guide the
+       student through the File menu's **"Load from your computer"** item (it stays in English even in the
+       Hebrew interface -- a real gap in Scratch's own translation, not a typo) in *that specific tab*, but expect
+       they'll likely need an adult alongside them to actually navigate to the file (give the full path for the
+       adult's benefit).
      - If there's no starter: the blank project already in that tab is the starting point -- nothing else to load.
    - **If Claude in Chrome isn't available:** guide the student the same way in whatever Scratch window they
      already have open (an adult's help finding `starter.sb3` by its full path, or starting a new empty project
