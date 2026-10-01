@@ -17,8 +17,10 @@ Arguments: $ARGUMENTS
      if a group already exists), then `navigate` a tab in that group to `scratch.mit.edu`. Tell the student
      plainly: this is the tab to work in from now on.
    - **Guide the student to reopen their project from their own Scratch account ("הדברים שלי"), not a local
-     file:** tell them to sign in if they aren't already, click their username (top right) → **הדברים שלי**, find
-     the project from last time, and click on it to open it. This only works if the student actually has a
+     file:** tell them to sign in if they aren't already, then get to **הדברים שלי** -- the fastest route is a
+     purple **folder icon** in the editor's own top bar (only shown when signed in); if that isn't visible, their
+     username (top right) → הדברים שלי also works. Find the project from last time, and click on it to open it.
+     This only works if the student actually has a
      Scratch account and saved there online (as opposed to only ever using the File menu's "הורידו למחשב", which
      downloads locally and doesn't appear in הדברים שלי) -- most students who've used Scratch before already do this.
    - **If that doesn't pan out** (no account, can't find the project there, or it doesn't match what `state.json`

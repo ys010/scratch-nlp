@@ -42,7 +42,9 @@ only when you actually reach that step, don't pre-populate the rest.
 - File menu → **"Load from your computer"** stays in English even with the rest of the interface in Hebrew --
   a real gap in Scratch's own translation, not a mistake on your part. Tell the child to look for that exact
   English phrase inside the otherwise-Hebrew menu.
-- Account menu (their username, top right) → **"הדברים שלי"** ("My Stuff") lists everything saved online.
+- **הדברים שלי** ("My Stuff") lists everything saved online. Fastest route: a purple **folder icon** in the
+  editor's own top bar (only shown when signed in) goes straight there -- simpler for a child to spot than the
+  username dropdown. The username (top right) → "הדברים שלי" route also works if that icon isn't visible.
 - Opening a project from there: the exact button label isn't verified, so don't name one -- tell the child to
   click the project's own thumbnail/title to open it.
 - The File menu button itself has no text, in any language -- it's an icon only (a small pencil over paper, top
@@ -59,8 +61,9 @@ only when you actually reach that step, don't pre-populate the rest.
      -- *"I'm going to open your project in a tab I can see, so I can check your work. Please keep working in
      this tab from now on, okay?"* -- then `navigate` a tab in the group to `scratch.mit.edu`. If the project
      isn't a blank one at this point in the run, guide the *child* to reopen it from their own account -- sign
-     in if needed, click their username (top right) → **הדברים שלי** → click their project to open it -- same as
-     `/resume-lesson` does. Only fall back to asking the adult (loading the local snapshot by file path) if that
+     in if needed, click the purple folder icon in the editor's top bar (or their username → הדברים שלי) → click
+     their project to open it -- same as `/resume-lesson` does. Only fall back to asking the adult (loading the
+     local snapshot by file path) if that
      doesn't pan out.
    - **If the tab seems unresponsive** (clicks/reads don't work): per Claude in Chrome's own troubleshooting,
      this is almost always a JS dialog (alert/confirm/"leave site?") sitting open and blocking all input, for
